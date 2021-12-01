@@ -8,6 +8,8 @@
 import express, { response } from "express";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
+import { moviesrouter } from "./routes/movie.js";
+import { getMovies, createMovies, getMovieById, deleteMovieById, udateMovieById } from "./helper.js";
 dotenv.config();
 console.log(process.env);//put all key value pairs in the process.env
 const movies = [{
@@ -74,7 +76,7 @@ async function Createconnection() {
     console.log("mongodb connect");
     return client;
 }
-const client = await Createconnection();
+export const client = await Createconnection();
 // const express = require("express");
 const app = express();
 const PORT = 9000;
@@ -84,101 +86,9 @@ app.get("/", (request, response) => {
     response.send("hello 🌎🎉🎉");
 });
 
-app.get("/movies", async (request, response) => {
-    const filter = request.query;
-    console.log(filter);
-    if (filter.rating) {
-        filter.rating = parseFloat(filter.rating);
-    }
-
-    // let filteredmovie = movies;
-    // if (language) {
-    //     filteredmovie = filteredmovie.filter((data) => (data.language === language));
-
-    // }
-    // if (rating) {
-    //     filteredmovie = filteredmovie.filter((data) => data.rating === +rating);
-    //     console.log(rating);
-    // }
-    const filteredmovie = await getMovies(filter);
-    //curser to array(only 20 will return to written all we  convert to array)
-    // console.log(filteredmovie);
-    response.send(filteredmovie);
-});
-app.post("/movies", async (request, response) => {
-    const data = request.body;
-    console.log(data);
-    const result = await createMovies(data);
-    response.send(result);
-    //go to postman and get copy of movie and select the body,raw
-    //and json paste it and send it
-});
-app.get("/movies/:id", async (request, response) => {
-    const { id } = request.params;
-    console.log(id);
-    const movie = await getMovieById(id);
-    // // const movie = movies.filter((data) => (data.id === id))[0];
-    // const movie = movies.find((data) => (data.id === id));
-    // if (movie != undefined)
-    //     response.send(movie);
-    // else response.send("movie not found");
-    movie ? response.send(movie) : response.status(404).send({ message: "movie not found" });
-});
 
 
-app.delete("/movies/:id", async (request, response) => {
-    const { id } = request.params;
-    console.log(id);
-    const Deletedmovie = await deleteMovieById(id);
-    Deletedmovie.deletedCount>0
-     ? response
-    .send(Deletedmovie) : response.status(404)
-    .send({ message: "movie not found" });
-});
 
-app.put("/movies/:id", async (request, response) => {
-    const { id } = request.params;
-    console.log(id);
-    const data=request.body;
-    const updatedmovie = await udateMovieById(id, data);
-    const data1=await getMovieById(id);
-    response.send(data1)
-    // Deletedmovie.deletedCount>0
-    //  ? 
-    //  response.send(Deletedmovie) : response.status(404)
-    // .send({ message: "movie not found" });
-});
+app.use("/movies",moviesrouter)
 app.listen(PORT, () => console.log("App is started", PORT));
-async function udateMovieById(id, data) {
-    return await client
-        .db("Movies")
-        .collection("movielist")
-        .updateOne({ id: id }, { $set: data });
-}
-
-async function createMovies(data) {
-    return await client.db("Movies").collection("movielist").insertMany(data);
-}
-
-async function getMovies(filter) {
-    return await client
-        .db("Movies")
-        .collection("movielist")
-        .find(filter)
-        .toArray();
-}
-
-async function deleteMovieById(id) {
-    return await client
-        .db("Movies")
-        .collection("movielist")
-        .deleteOne({ id: id });
-}
-
-async function getMovieById(id) {
-    return await client
-        .db("Movies")
-        .collection("movielist")
-        .findOne({ id: id });
-}
 

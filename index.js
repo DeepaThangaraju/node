@@ -79,11 +79,13 @@ async function Createconnection() {
 }
 export const client = await Createconnection();
 // const express = require("express");
+
 const app = express();
+app.use(cors());//to acess by any origin we go for cors
 const PORT = process.env.PORT;//heruko automatically assign the port
 app.use(express.json());//every request in the app body is passed as json
 //express.json is a middleware
-app.use(cors());//to acess by any origin we go for cors
+
 app.get("/", (request, response) => {
     response.send("hello 🌎");
 });

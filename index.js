@@ -9,6 +9,7 @@ import express, { response } from "express";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 import { moviesrouter } from "./routes/movie.js";
+import cors from 'cors';
 import { getMovies, createMovies, getMovieById, deleteMovieById, udateMovieById } from "./helper.js";
 dotenv.config();
 console.log(process.env);//put all key value pairs in the process.env
@@ -82,6 +83,7 @@ const app = express();
 const PORT = process.env.PORT;//heruko automatically assign the port
 app.use(express.json());//every request in the app body is passed as json
 //express.json is a middleware
+app.use(cors());//to acess by any origin we go for cors
 app.get("/", (request, response) => {
     response.send("hello 🌎");
 });

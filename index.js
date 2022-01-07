@@ -9,11 +9,12 @@ import express, { response } from "express";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 import { moviesrouter } from "./routes/movie.js";
+import { userrouter } from "./routes/user.js";
 import cors from 'cors';
 import bcrypt from "bcrypt";
 import { getMovies, createMovies, getMovieById, deleteMovieById, udateMovieById } from "./helper.js";
 dotenv.config();
-console.log(process.env);//put all key value pairs in the process.env
+// console.log(process.env);//put all key value pairs in the process.env
 const movies = [{
     id: "100",
     name: "Doctor",
@@ -95,13 +96,7 @@ app.get("/", (request, response) => {
 
 
 app.use("/movies",moviesrouter);
-async function genpassword(password){
-    const rounds=10;
-    const salt=await bcrypt.genSalt(rounds);
-    console.log(salt);
-    const hash=await bcrypt.hash(password,salt);
-    console.log(hash);
-}
-genpassword("password123");
+app.use("/users",userrouter);
+
 app.listen(PORT, () => console.log("App is started", PORT));
 

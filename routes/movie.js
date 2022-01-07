@@ -1,8 +1,9 @@
 import express from "express";
+import {auth} from "../middleware/auth.js";
 import { getMovies, createMovies, getMovieById, deleteMovieById, udateMovieById } from "../helper.js";
 const router = express.Router();
 router
-.route("/").get( async (request, response) => {
+.route("/").get(auth, async (request, response) => {
     const filter = request.query;
     console.log(filter);
     if (filter.rating) {
@@ -22,7 +23,7 @@ router
     //curser to array(only 20 will return to written all we  convert to array)
     // console.log(filteredmovie);
     response.send(filteredmovie);
-}).post( async (request, response) => {
+}).post( auth,async (request, response) => {
     const data = request.body;
     console.log(data);
     const result = await createMovies(data);

@@ -1,5 +1,6 @@
 import { client } from "./index.js";
-import {ObjectId} from "mongodb"
+import {ObjectId} from "mongodb";
+import bcrypt from 'bcrypt';
 
  async function udateMovieById(id, data) {
     return await client
@@ -9,6 +10,15 @@ import {ObjectId} from "mongodb"
 }
  async function createMovies(data) {
     return await client.db("Movies").collection("movielist").insertMany(data);
+}
+async function createUser(data) {
+    return await client.db("Movies").collection("users").insertOne(data);
+}
+async function getuserByName(username) {
+   return await client
+       .db("Movies")
+       .collection("users")
+       .findOne( {username:username});
 }
  async function getMovies(filter) {
     return await client
@@ -30,4 +40,19 @@ import {ObjectId} from "mongodb"
         .collection("movielist")
         .findOne({ _id: ObjectId(id) });
 }
-export { getMovies, createMovies, getMovieById, deleteMovieById, udateMovieById }
+
+async function genpassword(password){
+    const rounds=10;
+    const salt=await bcrypt.genSalt(rounds);
+    console.log(salt);
+    const hash=await bcrypt.hash(password,salt);
+    return hash;
+}
+export { getMovies, 
+    createMovies, 
+    getMovieById, 
+    deleteMovieById, 
+    udateMovieById,
+    genpassword,
+createUser,
+getuserByName }
